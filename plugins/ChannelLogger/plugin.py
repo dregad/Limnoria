@@ -94,11 +94,21 @@ class ChannelLogger(callbacks.Plugin):
         format = self.registryValue('filenameTimestamp', channel, network)
         return time.strftime(format)
 
+    def getChannelName(self, channel):
+        """
+        Returns channel name with or without '#' prefix depending on config
+        """
+        if self.registryValue('noHashPrefix', channel):
+            return channel[1:]
+        else:
+            return channel
+
     def getLogName(self, network, channel):
         if self.registryValue('rotateLogs', channel, network):
-            name = '%s.%s.log' % (channel, self.logNameTimestamp(network, channel))
+            name = '%s.%s.log' % (self.getChannelName(channel),
+                                  self.logNameTimestamp(network, channel))
         else:
-            name = '%s.log' % channel
+            name = '%s.log' % self.getChannelName(channel)
         return utils.file.sanitizeName(name)
 
     def getLogDir(self, irc, channel):
@@ -108,7 +118,7 @@ class ChannelLogger(callbacks.Plugin):
             if self.registryValue('directories.network'):
                 logDir = os.path.join(logDir,  irc.network)
             if self.registryValue('directories.channel'):
-                logDir = os.path.join(logDir, utils.file.sanitizeName(channel))
+                logDir = os.path.join(logDir, utils.file.sanitizeName(self.getChannelName(channel)))
             if self.registryValue('directories.timestamp'):
                 format = self.registryValue('directories.timestamp.format')
                 timeDir =time.strftime(format)

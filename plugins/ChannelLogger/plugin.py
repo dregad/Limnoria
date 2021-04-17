@@ -96,10 +96,11 @@ class ChannelLogger(callbacks.Plugin):
 
     def getChannelName(self, channel):
         """
-        Returns channel name with or without '#' prefix depending on config
+        Returns channel name with or without leading '#' character(s)
+        depending on plugin's noHashPrefix configuration
         """
         if self.registryValue('noHashPrefix', channel):
-            return channel[1:]
+            return channel.lstrip('#')
         else:
             return channel
 
